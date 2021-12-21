@@ -47,5 +47,5 @@ router.post("/register", async (req: any, res: any) => {
       console.log(err);
     }
   });
-
+  
 module.exports = router;
