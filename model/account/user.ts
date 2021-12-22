@@ -1,3 +1,6 @@
+import { UserDto } from "../../dto/account/userDto";
+const jwt = require('jsonwebtoken')
+require("dotenv").config();
 require("./gender");
 const mongoose = require("mongoose");
 const validator = require("validator");
@@ -32,6 +35,7 @@ const userSchema = new mongoose.Schema(
     phone: {
       type: String,
       required: true,
+      unique:true
     },
     age: {
       type: Number,
@@ -42,7 +46,14 @@ const userSchema = new mongoose.Schema(
       required: true,
       ref: "gender",
     },
+    tokens:[{
+      token:{
+      type:String,
+      require:true
+  }
+  }],
   },
+  
   {
     timestamps: true,
   }
@@ -64,9 +75,41 @@ userSchema.methods.toJSON = function () {
   const user = this;
   const jsonObject = user.toObject();
   delete jsonObject.password;
+  delete jsonObject.tokens
   return jsonObject;
 };
+userSchema.methods.setUserToken=async function(){
+  const user=this
+  const token=jwt.sign({_id:user.id},process.env.TOKEN_KEY,{expiresIn:'7d'})
+  user.tokens=user.tokens.concat({token})
+  await user.save()
+  return token
+  }
+userSchema.statics.checkUsercredential = async function  (phone:string, password:string) {
+  const user = await User.findOne({ phone });
+ 
+  if (!user) {
+    return { Error: "Invalid Login Attempt!" };
+  }
+  const checkPwd = await bcrypt.compare(password, user.password);
+ 
+  if (!checkPwd) {
+    return { Error: "Wrong Password !" };
+  }
+  const token= await user.setUserToken()
+  
 
+  const userResponse:UserDto={
+    name:user.name,
+    age:user.age,
+    email:user.email,
+    genderId:user.genderId,
+    id:user._id,
+    phone:user.phone,
+    token:token
+  };
+  return userResponse;
+};
 const User = mongoose.model("user", userSchema);
 
 export default User;
