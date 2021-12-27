@@ -1,5 +1,4 @@
 import { KeyVal } from "../../dto/shared/keyVal";
-import { UserDto } from "../../dto/account/userDto";
 import User from "../../model/account/user";
 require('util').inspect.defaultOptions.depth = null
 const express = require("express");
