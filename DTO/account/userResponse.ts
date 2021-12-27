@@ -1,9 +1,9 @@
-export interface Register {
+export interface UserResponse {
   name: string;
   email: string;
   phone: string;
-  password: string;
-  confirmPassword: string;
   age: number;
   genderId: string;
+  id: string;
+  token: string;
 }
