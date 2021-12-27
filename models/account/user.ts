@@ -1,3 +1,5 @@
+import { UserResponse } from "../../DTO/account/userResponse";
+
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 require("./gender");
@@ -104,12 +106,13 @@ userSchema.statics.checkUsercredential = async function (
   }
   const token = await user.setUserToken();
 
-  const userResponse = {
+  const userResponse: UserResponse = {
     id: user._id,
     name: user.name,
     age: user.age,
     email: user.email,
     phone: user.phone,
+    token: token,
     genderId: user.genderId,
   };
   return userResponse;
