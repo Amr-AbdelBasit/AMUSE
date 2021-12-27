@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const genderSchema = new mongoose.Schema(
+const _mongoose = require("mongoose");
+const genderSchema = new _mongoose.Schema(
   {
     isActive: {
       type: Boolean,
@@ -8,13 +8,13 @@ const genderSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
-    }
+    },
   },
   {
     timestamps: true,
   }
 );
 
-const GenderModel = mongoose.model("gender", genderSchema);
+const GenderModel = _mongoose.model("gender", genderSchema);
 
 module.exports = GenderModel;

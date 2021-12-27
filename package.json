@@ -27,7 +27,9 @@
     "mongodb": "^4.2.2",
     "mongoose": "^6.1.2",
     "mongoose-referrence-validator": "^1.0.0",
+    "multer": "^1.4.4",
     "nodemon": "^2.0.15",
+    "path": "^0.12.7",
     "validator": "^13.7.0"
   }
 }
