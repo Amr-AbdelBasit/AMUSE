@@ -1,10 +1,50 @@
+export {};
 const fs = require("fs");
 const path = require("path");
+const multer = require("multer");
+const url = require("url");
+
 module.exports = {
   async upload(req: any, res: any) {
-    res.status = 200;
-    res.setHeader("Content-Type", "application/json");
-    res.json(req.file);
+    const videoStorage = multer.diskStorage({
+      destination: function (req: any, file: any, cb: any) {
+        cb(null, "public/videos");
+      },
+
+      filename: function (req: any, file: any, cb: any) {
+        cb(null, `${Date.now()}_${file.originalname}`);
+      },
+
+      fileFilter: function (req: any, file: any, cb: any) {
+        const ext = path.extname(file.originalname);
+        console.log("extension: " + ext);
+        console.log("file: " + file);
+
+        if (ext !== ".mp4") {
+          return cb(null, false);
+        }
+        cb(null, true);
+      },
+    });
+
+    const uploadVideo = multer({ storage: videoStorage }).single("video");
+    uploadVideo(req, res, (err: any) => {
+      if (err instanceof multer.MulterError) {
+        res.json({ success: false, err });
+      } else if (err) {
+        console.log(err);
+        res.json({ success: false, err });
+      } else {
+        res.status = 200;
+        res.setHeader("Content-Type", "application/json");
+
+        res.json({
+          success: true,
+          filePath: req.file.path,
+          fileName: req.file.filename,
+        });
+      }
+    });
   },
 
   async get(req: any, res: any) {
@@ -14,7 +54,10 @@ module.exports = {
     }
 
     // get video stats (about 61MB)
-    const videoPath = path.resolve("D:/Work/AMUSE/public/videos");
+    // const query = url.parse(req.url, true).query;
+    const fileName = req.params.fileName;
+    // console.log(fileName);
+    const videoPath = path.resolve("public/videos", fileName);
 
     const videoSize = fs.statSync(videoPath).size;
 
