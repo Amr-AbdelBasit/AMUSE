@@ -12,6 +12,9 @@ app.use(express.json());
 require("./routes/user_routes")(app);
 require("./routes/gender_routes")(app);
 require("./routes/video_route")(app);
+require("./routes/classification_routes")(app);
+require("./routes/category_routes")(app);
+require("./routes/type_routes")(app);
 
 app.get("/file", function (req: any, res: any) {
   res.sendFile(__dirname + "/public/index.html");

@@ -1,4 +1,4 @@
-const User = require("../models/account/user");
+const User = require("../models/user");
 require("util").inspect.defaultOptions.depth = null;
 
 module.exports = {

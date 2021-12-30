@@ -1,4 +1,4 @@
-import { UserResponse } from "../../DTO/account/userResponse";
+import { UserResponse } from "../DTO/account/userResponse";
 
 const jwt = require("jsonwebtoken");
 require("dotenv").config();

@@ -1,4 +1,4 @@
-const Gender = require("../models/account/gender");
+const Gender = require("../models/gender");
 
 module.exports = {
   async add(req: any, res: any, next: any) {
