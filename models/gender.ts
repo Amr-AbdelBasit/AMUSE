@@ -3,7 +3,7 @@ const genderSchema = new _mongoose.Schema(
   {
     isActive: {
       type: Boolean,
-      required: true,
+      default: true,
     },
     name: {
       type: String,

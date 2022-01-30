@@ -14,6 +14,8 @@ module.exports = {
         typesResponse.push({
           id: type.id,
           name: type.name,
+          EnglishName: type.get("name.en"),
+          ArabicName: type.get("name.ar"),
         });
       });
     })

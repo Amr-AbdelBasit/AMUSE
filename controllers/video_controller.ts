@@ -2,6 +2,7 @@ export {};
 const fs = require("fs");
 const path = require("path");
 const multer = require("multer");
+const Video = require("../models/video");
 const url = require("url");
 
 module.exports = {
@@ -84,5 +85,17 @@ module.exports = {
 
     // Stream the video chunk to the client
     videoStream.pipe(res);
+  },
+
+  async add(req: any, res: any, next: any) {
+    Video.create(req.body)
+      .then((video: any) => res.status(201).send(video))
+      .catch(next);
+  },
+
+  async getById(req: any, res: any, next: any) {
+    Video.findById({ _id: req.query.id })
+      .then((video: any) => res.status(200).send(video))
+      .catch(next);
   },
 };
