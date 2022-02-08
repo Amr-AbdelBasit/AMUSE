@@ -18,9 +18,10 @@ const userViewsSchema = new mongoose.Schema(
       required: true,
       ref: "video",
     },
-    viewsCountd: {
+    viewsCount: {
       type: Number,
       require: true,
+      default: 1,
     },
   },
   {

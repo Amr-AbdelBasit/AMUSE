@@ -15,6 +15,8 @@ require("./routes/video_route")(app);
 require("./routes/classification_routes")(app);
 require("./routes/category_routes")(app);
 require("./routes/type_routes")(app);
+require("./routes/user_views_routes")(app);
+require("./routes/user_wish_list_routes")(app);
 
 // var ffmpegbinaries = require("ffmpeg-binaries");
 // var ffmpeg = require("fluent-ffmpeg");

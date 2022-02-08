@@ -5,6 +5,17 @@ const multer = require("multer");
 const Video = require("../models/video");
 const url = require("url");
 
+const Jimp = require("jimp");
+const fs_extra = require("fs-extra");
+const util = require("util");
+
+const exec = util.promisify(require("child_process").exec);
+
+const debug = false;
+const videoEncoder = "h264"; // mpeg4 libvpx
+const input = "input.mp4";
+const output = "output.mp4";
+
 module.exports = {
   async upload(req: any, res: any) {
     const videoStorage = multer.diskStorage({
@@ -47,6 +58,45 @@ module.exports = {
       }
     });
   },
+
+  // async get(req: any, res: any) {
+  //   const range = req.headers.range;
+  //   if (!range) {
+  //     res.status(400).send("Requires Range header");
+  //   }
+
+  //   // get video stats (about 61MB)
+  //   // const query = url.parse(req.url, true).query;
+  //   const fileName = req.params.fileName;
+  //   // console.log(fileName);
+  //   const videoPath = path.resolve("public/videos", fileName);
+
+  //   const videoSize = fs.statSync(videoPath).size;
+
+  //   // Parse Range
+  //   // Example: "bytes=32324-"
+  //   const CHUNK_SIZE = 10 ** 6; // 1MB
+  //   const start = Number(range.replace(/\D/g, ""));
+  //   const end = Math.min(start + CHUNK_SIZE, videoSize - 1);
+
+  //   // Create headers
+  //   const contentLength = end - start + 1;
+  //   const headers = {
+  //     "Content-Range": `bytes ${start}-${end}/${videoSize}`,
+  //     "Accept-Ranges": "bytes",
+  //     "Content-Length": contentLength,
+  //     "Content-Type": "video/mp4",
+  //   };
+
+  //   // HTTP Status 206 for Partial Content
+  //   res.writeHead(206, headers);
+
+  //   // create video read stream for this particular chunk
+  //   const videoStream = fs.createReadStream(videoPath, { start, end });
+
+  //   // Stream the video chunk to the client
+  //   videoStream.pipe(res);
+  // },
 
   async get(req: any, res: any) {
     const range = req.headers.range;

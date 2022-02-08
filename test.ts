@@ -28,8 +28,9 @@ const output = "output.mp4";
       // Read the frame
       let frame = await Jimp.read(`temp/raw-frames/${count}.png`).then(
         (img) => {
-          return img.resize(250, 250); // resize
-          // .quality(60); // set JPEG quality
+          return img
+            .resize(250, 250) // resize
+            .quality(60); // set JPEG quality
           // .greyscale(); // set greyscale
         }
       );
