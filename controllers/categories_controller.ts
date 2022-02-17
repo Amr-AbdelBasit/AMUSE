@@ -13,12 +13,25 @@ module.exports = {
       categories.forEach((category: any) => {
         categoriesResponse.push({
           id: category.id,
-          name: category.name,
+          enName: category.get("name.en"),
+          arName: category.get("name.ar"),
         });
       });
     })
       .clone()
       .then(() => res.status(200).send({ categories: categoriesResponse }))
+      .catch(next);
+  },
+
+  async delete(req: any, res: any, next: any) {
+    Category.findByIdAndUpdate({ _id: req.params.id }, { isActive: false })
+      .then((category: any) => {
+        if (category) {
+          res.status(200).send("Deleted successfully!");
+        } else {
+          res.status(400).send("This category is not exist!");
+        }
+      })
       .catch(next);
   },
 };

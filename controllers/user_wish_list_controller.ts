@@ -12,4 +12,21 @@ module.exports = {
         .catch(next);
     }
   },
+
+  async all(req: any, res: any, next: any) {
+    const wishListsResponse = new Array();
+    UserWishList.find({ isActive: true, userId: req.params.userId })
+      .populate("user video", { name: 1, _id: 0 })
+      .exec((err: any, wishLists: any) => {
+        if (err) res.status(400).send(err);
+        wishLists.forEach((wishList: any) => {
+          wishListsResponse.push({
+            id: wishList.id,
+            userName: wishList.user.name,
+            videoName: wishList.video.name,
+          });
+        });
+        res.status(200).send({ wishList: wishListsResponse });
+      });
+  },
 };
