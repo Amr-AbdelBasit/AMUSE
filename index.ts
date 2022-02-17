@@ -2,6 +2,29 @@ require("./startup/mogoose");
 require("dotenv").config();
 const cors = require("cors");
 require("util").inspect.defaultOptions.depth = null;
+var ffmpeg = require("fluent-ffmpeg");
+
+ffmpeg.setFfmpegPath("./bin/ffmpeg");
+
+ffmpeg.setFfprobePath("./bin/ffprobe");
+
+ffmpeg("1641905461289_part3.wmv")
+  .on("end", function () {
+    console.log("Screenshots taken");
+  })
+
+  .on("error", function (err: any) {
+    console.error("this error:");
+
+    console.error(err);
+  })
+  .screenshots({
+    // Will take screenshots at 20%, 40%, 60% and 80% of the video
+
+    count: 4,
+
+    folder: "public/uploads",
+  });
 const express = require("express");
 const app = express();
 const port = process.env.PORT;
