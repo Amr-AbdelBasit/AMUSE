@@ -5,8 +5,6 @@ const multer = require("multer");
 const Video = require("../models/video");
 const url = require("url");
 
-const Jimp = require("jimp");
-const fs_extra = require("fs-extra");
 const util = require("util");
 
 const exec = util.promisify(require("child_process").exec);
@@ -147,5 +145,97 @@ module.exports = {
     Video.findById({ _id: req.query.id })
       .then((video: any) => res.status(200).send(video))
       .catch(next);
+  },
+
+  async getBySeriesId(req: any, res: any, next: any) {
+    const videosResponse = new Array();
+    Video.find(
+      { isActive: true, seriesId: req.params.seriesId },
+      function (err: any, videos: any) {
+        videos.forEach((video: any) => {
+          videosResponse.push({
+            id: video.id,
+            path: video.path,
+            name: video.name,
+            description: video.description,
+          });
+        });
+      }
+    )
+      .clone()
+      .then(() => res.status(200).send(videosResponse))
+      .catch(next);
+  },
+
+  async getByCategoryId(req: any, res: any, next: any) {
+    const videosResponse = new Array();
+    Video.find(
+      { isActive: true, categoryId: req.params.categoryId },
+      function (err: any, videos: any) {
+        videos.forEach((video: any) => {
+          videosResponse.push({
+            id: video.id,
+            path: video.path,
+            name: video.name,
+            description: video.description,
+            seriesId: video.seriesId,
+          });
+        });
+      }
+    )
+      .clone()
+      .then(() => res.status(200).send(videosResponse))
+      .catch(next);
+  },
+
+  async searchByName(req: any, res: any, next: any) {
+    const videos = await Video.aggregate([
+      {
+        $match: {
+          $and: [
+            {
+              name: { $gte: req.params.name },
+            },
+            { isActive: true },
+          ],
+        },
+      },
+      { $sort: { createdAt: -1 } },
+      // { $skip: 5 * req.query.index},
+      // { $limit: 5 },
+    ]);
+
+    res.status(200).send(videos);
+  },
+
+  async uploadImg(req: any, res: any) {
+    const imgStorage = multer.diskStorage({
+      destination: function (req: any, file: any, cb: any) {
+        cb(null, "public/images");
+      },
+
+      filename: function (req: any, file: any, cb: any) {
+        cb(null, `${Date.now()}_${file.originalname}`);
+      },
+    });
+
+    const uploadImg = multer({ storage: imgStorage }).single("img");
+    uploadImg(req, res, (err: any) => {
+      if (err instanceof multer.MulterError) {
+        res.json({ success: false, err });
+      } else if (err) {
+        console.log(err);
+        res.json({ success: false, err });
+      } else {
+        res.status = 200;
+        res.setHeader("Content-Type", "application/json");
+
+        res.json({
+          success: true,
+          filePath: req.file.path,
+          fileName: req.file.filename,
+        });
+      }
+    });
   },
 };

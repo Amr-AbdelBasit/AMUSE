@@ -8,12 +8,12 @@ const userWishListSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    userId: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "user",
     },
-    videoId: {
+    video: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "video",

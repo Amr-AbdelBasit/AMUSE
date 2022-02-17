@@ -18,4 +18,22 @@ module.exports = {
         .catch(next);
     }
   },
+
+  async all(req: any, res: any, next: any) {
+    const userViewsResponse = new Array();
+    UserViews.find({ isActive: true, userId: req.params.userId })
+      .populate("user video", { name: 1, _id: 0 })
+      .exec((err: any, userViews: any) => {
+        if (err) res.status(400).send(err);
+        userViews.forEach((userView: any) => {
+          userViewsResponse.push({
+            id: userView.id,
+            userName: userView.user.name,
+            videoName: userView.video.name,
+            viewsCount: userView.viewsCount,
+          });
+        });
+        res.status(200).send({ userViews: userViewsResponse });
+      });
+  },
 };

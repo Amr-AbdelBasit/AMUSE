@@ -13,7 +13,8 @@ module.exports = {
       genders.forEach((gender: any) => {
         gendersResponse.push({
           id: gender.id,
-          name: gender.name,
+          enName: gender.get("name.en"),
+          arName: gender.get("name.ar"),
         });
       });
     })
@@ -43,14 +44,13 @@ module.exports = {
   },
 
   async delete(req: any, res: any, next: any) {
-    const genderId = req.params.id;
-    Gender.findByIdAndUpdate({ _id: genderId }, { isActive: false })
+    Gender.findByIdAndUpdate({ _id: req.params.id }, { isActive: false })
       .then((gender: any) => {
-        if (gender == null) {
+        if (gender) {
           // console.log("gender: " + gender);
-          res.status(400).send("This gender is not exist!");
-        } else {
           res.status(200).send("Deleted successfully!");
+        } else {
+          res.status(400).send("This gender is not exist!");
         }
       })
       .catch(next);

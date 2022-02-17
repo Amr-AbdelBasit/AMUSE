@@ -17,6 +17,10 @@ require("./routes/category_routes")(app);
 require("./routes/type_routes")(app);
 require("./routes/user_views_routes")(app);
 require("./routes/user_wish_list_routes")(app);
+require("./routes/subtitle_routes")(app);
+require("./routes/audio_routes")(app);
+require("./routes/cast_routes")(app);
+require("./routes/series_routes")(app);
 
 // var ffmpegbinaries = require("ffmpeg-binaries");
 // var ffmpeg = require("fluent-ffmpeg");
