@@ -1,22 +1,22 @@
-import { UserResponse } from "../DTO/account/userResponse";
+import { UserResponse } from "../DTO/user/userResponse";
 
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-require("./gender");
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
 const referrenceValidator = require("mongoose-referrence-validator");
+const mongooseIntl = require("mongoose-intl");
+
+require("./gender");
+require("./user_account");
 
 const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
-    },
-    isActive: {
-      type: Boolean,
-      default: true,
+      intl: true,
     },
     email: {
       type: String,
@@ -42,6 +42,9 @@ const userSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    code: {
+      type: Number,
+    },
     genderId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
@@ -55,12 +58,24 @@ const userSchema = new mongoose.Schema(
         },
       },
     ],
+    userAccounts: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "userAccount",
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
-
   {
     timestamps: true,
   }
 );
+
+userSchema.plugin(mongooseIntl, {
+  languages: ["ar", "en"],
+  defaultLanguage: "en",
+});
 
 userSchema.plugin(referrenceValidator);
 
@@ -95,6 +110,7 @@ userSchema.statics.checkUsercredential = async function (
   password: string
 ) {
   const user = await UserModel.findOne({ phone });
+  // console.log("user", user);
 
   if (!user) {
     return { Error: "Invalid Login Attempt!" };

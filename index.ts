@@ -38,6 +38,40 @@ require("./routes/video_route")(app);
 require("./routes/classification_routes")(app);
 require("./routes/category_routes")(app);
 require("./routes/type_routes")(app);
+require("./routes/user_views_routes")(app);
+require("./routes/user_wish_list_routes")(app);
+require("./routes/subtitle_routes")(app);
+require("./routes/audio_routes")(app);
+require("./routes/cast_routes")(app);
+require("./routes/series_routes")(app);
+
+// var ffmpegbinaries = require("ffmpeg-binaries");
+// var ffmpeg = require("fluent-ffmpeg");
+// ffmpeg.setFfmpegPath("/user/bin/ffmpeg");
+// ffmpeg.setFfprobePath("/user/bin/ffprobe");
+
+// var ffmpegpath = ffmpegbinaries.ffmpegpath();
+// var ffprobepath = ffmpegbinaries.ffprobepath();
+
+// ffmpeg.setffmpegpath(ffmpegpath);
+
+// ffmpeg("1641905461289_part3.wmv")
+//   .on("end", function () {
+//     console.log("Screenshots taken");
+//   })
+
+//   .on("error", function (err: any) {
+//     console.error("this error:");
+
+//     console.error(err);
+//   })
+//   .screenshots({
+//     // Will take screenshots at 20%, 40%, 60% and 80% of the video
+
+//     count: 4,
+
+//     folder: "public/uploads",
+//   });
 
 app.get("/file", function (req: any, res: any) {
   res.sendFile(__dirname + "/public/index.html");

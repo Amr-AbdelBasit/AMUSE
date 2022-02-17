@@ -1,21 +1,28 @@
 export {};
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
+const mongooseIntl = require("mongoose-intl");
 
 const classificationSchema = new mongoose.Schema(
   {
     isActive: {
       type: Boolean,
-      required: true,
+      default: true,
     },
     name: {
       type: String,
-      require: true,
+      required: true,
+      intl: true,
     },
   },
   {
     timestamps: true,
   }
 );
+
+classificationSchema.plugin(mongooseIntl, {
+  languages: ["ar", "en"],
+  defaultLanguage: "en",
+});
 
 const classificationModel = mongoose.model(
   "classification",

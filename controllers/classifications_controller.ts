@@ -15,7 +15,8 @@ module.exports = {
         classifications.forEach((classification: any) => {
           classificationsResponse.push({
             id: classification.id,
-            name: classification.name,
+            enName: classification.get("name.en"),
+            arName: classification.get("name.ar"),
           });
         });
       }
@@ -24,6 +25,21 @@ module.exports = {
       .then(() =>
         res.status(200).send({ Classifications: classificationsResponse })
       )
+      .catch(next);
+  },
+
+  async delete(req: any, res: any, next: any) {
+    Classification.findByIdAndUpdate(
+      { _id: req.params.id },
+      { isActive: false }
+    )
+      .then((classification: any) => {
+        if (classification) {
+          res.status(200).send("Deleted successfully!");
+        } else {
+          res.status(400).send("This gender is not exist!");
+        }
+      })
       .catch(next);
   },
 };
