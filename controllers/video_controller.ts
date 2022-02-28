@@ -1,18 +1,15 @@
 export {};
+import { ObjectId } from "mongodb";
+const Video = require("../models/video");
+const VideoHeader = require("../models/videoHeader");
 const fs = require("fs");
 const path = require("path");
 const multer = require("multer");
-const Video = require("../models/video");
-const url = require("url");
 
-const util = require("util");
-
-const exec = util.promisify(require("child_process").exec);
-
-const debug = false;
-const videoEncoder = "h264"; // mpeg4 libvpx
-const input = "input.mp4";
-const output = "output.mp4";
+// const debug = false;
+// const videoEncoder = "h264"; // mpeg4 libvpx
+// const input = "input.mp4";
+// const output = "output.mp4";
 
 module.exports = {
   async upload(req: any, res: any) {
@@ -57,7 +54,7 @@ module.exports = {
     });
   },
 
-  // async get(req: any, res: any) {
+  // async getByName(req: any, res: any) {
   //   const range = req.headers.range;
   //   if (!range) {
   //     res.status(400).send("Requires Range header");
@@ -65,7 +62,7 @@ module.exports = {
 
   //   // get video stats (about 61MB)
   //   // const query = url.parse(req.url, true).query;
-  //   const fileName = req.params.fileName;
+  //   const fileName = req.query.fileName;
   //   // console.log(fileName);
   //   const videoPath = path.resolve("public/videos", fileName);
 
@@ -96,15 +93,15 @@ module.exports = {
   //   videoStream.pipe(res);
   // },
 
-  async get(req: any, res: any) {
+  async getByName(req: any, res: any) {
     const range = req.headers.range;
     if (!range) {
-      res.status(400).send("Requires Range header");
+      res.status(400).send({ isSuccess: false, msg: "Requires Range header" });
     }
 
     // get video stats (about 61MB)
     // const query = url.parse(req.url, true).query;
-    const fileName = req.params.fileName;
+    const fileName = req.query.fileName;
     // console.log(fileName);
     const videoPath = path.resolve("public/videos", fileName);
 
@@ -137,75 +134,221 @@ module.exports = {
 
   async add(req: any, res: any, next: any) {
     Video.create(req.body)
-      .then((video: any) => res.status(201).send(video))
+      .then((video: any) =>
+        res.status(201).send({ isSuccess: true, data: video })
+      )
       .catch(next);
   },
 
-  async getById(req: any, res: any, next: any) {
-    Video.findById({ _id: req.query.id })
-      .then((video: any) => res.status(200).send(video))
+  async addVideoHeader(req: any, res: any, next: any) {
+    VideoHeader.create(req.body)
+      .then((video: any) =>
+        res.status(201).send({ isSuccess: true, data: video })
+      )
       .catch(next);
   },
 
-  async getBySeriesId(req: any, res: any, next: any) {
-    const videosResponse = new Array();
-    Video.find(
-      { isActive: true, seriesId: req.params.seriesId },
-      function (err: any, videos: any) {
-        videos.forEach((video: any) => {
-          videosResponse.push({
-            id: video.id,
-            path: video.path,
-            name: video.name,
-            description: video.description,
-          });
-        });
-      }
-    )
-      .clone()
-      .then(() => res.status(200).send(videosResponse))
-      .catch(next);
-  },
-
-  async getByCategoryId(req: any, res: any, next: any) {
-    const videosResponse = new Array();
-    Video.find(
-      { isActive: true, categoryId: req.params.categoryId },
-      function (err: any, videos: any) {
-        videos.forEach((video: any) => {
-          videosResponse.push({
-            id: video.id,
-            path: video.path,
-            name: video.name,
-            description: video.description,
-            seriesId: video.seriesId,
-          });
-        });
-      }
-    )
-      .clone()
-      .then(() => res.status(200).send(videosResponse))
-      .catch(next);
-  },
-
-  async searchByName(req: any, res: any, next: any) {
-    const videos = await Video.aggregate([
+  async getByHeaderId(req: any, res: any, next: any) {
+    const videoHeaderId = req.params.id;
+    const lang = req.query.lang == "ar" ? "ar" : "en";
+    let videos = await VideoHeader.aggregate([
       {
-        $match: {
-          $and: [
-            {
-              name: { $gte: req.params.name },
+        $lookup: {
+          from: "categories",
+          localField: "categoryId",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      {
+        $lookup: {
+          from: "genres",
+          localField: "genreId",
+          foreignField: "_id",
+          as: "genre",
+        },
+      },
+      {
+        $lookup: {
+          from: "casts",
+          localField: "castIds",
+          foreignField: "_id",
+          as: "casts",
+        },
+      },
+      {
+        $lookup: {
+          from: "videos",
+          localField: "_id",
+          foreignField: "videoHeaderId",
+          as: "videos",
+        },
+      },
+      { $match: { _id: new ObjectId(videoHeaderId) } },
+      { $unwind: "$category" },
+      { $unwind: "$genre" },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          imgPath: 1,
+          category: `$category.name.${lang}`,
+          genre: `$genre.name.${lang}`,
+          videos: {
+            $map: {
+              input: "$videos",
+              as: "video",
+              in: {
+                id: "$$video._id",
+                path: "$$video.path",
+                title: "$$video.name",
+                imgPath: "$$video.imgPath",
+                description: "$$video.description",
+                duration: "$$video.duration",
+                quality: "$$video.quality",
+                yearOfProduction: "$$video.yearOfProduction",
+                subtitle: `$$video.subtitleId.language.${lang}`,
+                audio: `$$video.audioId.language.${lang}`,
+              },
             },
-            { isActive: true },
-          ],
+          },
+          casts: {
+            $map: {
+              input: "$casts",
+              as: "cast",
+              in: {
+                id: "$$cast._id",
+                name: `$$cast.name.${lang}`,
+                imgPath: "$$cast.imgPath",
+              },
+            },
+          },
+        },
+      },
+    ]);
+
+    res.status(200).send({ isSuccess: true, data: videos });
+  },
+
+  async getAllWithCategories(req: any, res: any, next: any) {
+    const lang = req.query.lang == "ar" ? "ar" : "en";
+    let videos = await VideoHeader.aggregate([
+      {
+        $lookup: {
+          from: "categories",
+          localField: "categoryId",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      {
+        $lookup: {
+          from: "genres",
+          localField: "genreId",
+          foreignField: "_id",
+          as: "genre",
+        },
+      },
+      {
+        $lookup: {
+          from: "videos",
+          localField: "_id",
+          foreignField: "videoHeaderId",
+          as: "videos",
         },
       },
       { $sort: { createdAt: -1 } },
-      // { $skip: 5 * req.query.index},
-      // { $limit: 5 },
+      { $unwind: "$category" },
+      { $unwind: "$genre" },
+      {
+        $project: {
+          _id: 0,
+          category: `$category.name.${lang}`,
+          videoId: "$_id",
+          name: 1,
+          imgPath: 1,
+          genre: `$genre.name.${lang}`,
+          duration: {
+            $sum: "$videos.duration",
+          },
+        },
+      },
     ]);
 
-    res.status(200).send(videos);
+    res.status(200).send({ isSuccess: true, data: videos });
+  },
+  
+  async getByCategoryId(req: any, res: any, next: any) {
+    const categoryId = req.params.id;
+    const lang = req.query.lang == "ar" ? "ar" : "en";
+    let videos = await VideoHeader.aggregate([
+      {
+        $lookup: {
+          from: "categories",
+          localField: "categoryId",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      {
+        $lookup: {
+          from: "genres",
+          localField: "genreId",
+          foreignField: "_id",
+          as: "genre",
+        },
+      },
+      {
+        $lookup: {
+          from: "videos",
+          localField: "_id",
+          foreignField: "videoHeaderId",
+          as: "videos",
+        },
+      },
+      { $match: { categoryId: new ObjectId(categoryId) } },
+      { $sort: { createdAt: -1 } },
+      { $limit: 4 },
+      { $unwind: "$category" },
+      { $unwind: "$genre" },
+      {
+        $project: {
+          _id: 0,
+          category: `$category.name.${lang}`,
+          videoId: "$_id",
+          name: 1,
+          imgPath: 1,
+          genre: `$genre.name.${lang}`,
+          duration: {
+            $sum: "$videos.duration",
+          },
+        },
+      },
+    ]);
+
+    res.status(200).send({ isSuccess: true, data: videos });
+  },
+
+  async searchByName(req: any, res: any, next: any) {
+    const searchName = req.params.name;
+    try {
+      const videos = await Video.aggregate([
+        {
+          $match: {
+            $and: [{ name: { $gte: searchName } }, { isActive: true }],
+          },
+        },
+        { $sort: { createdAt: -1 } },
+        // { $skip: 5 * req.query.index},
+        // { $limit: 5 },
+      ]);
+
+      res.status(200).send({ isSuccess: true, data: videos });
+      // return specific props based on bussiness
+      // look at getById API ...
+    } catch (err) {
+      res.status(500).send({ isSuccess: false, err: err });
+    }
   },
 
   async uploadImg(req: any, res: any) {
@@ -221,21 +364,34 @@ module.exports = {
 
     const uploadImg = multer({ storage: imgStorage }).single("img");
     uploadImg(req, res, (err: any) => {
-      if (err instanceof multer.MulterError) {
-        res.json({ success: false, err });
-      } else if (err) {
-        console.log(err);
-        res.json({ success: false, err });
+      if (err) {
+        res.status(422).send({ isSuccess: false, err_msg: err.message });
       } else {
-        res.status = 200;
         res.setHeader("Content-Type", "application/json");
-
-        res.json({
-          success: true,
-          filePath: req.file.path,
-          fileName: req.file.filename,
+        res.status(200).send({
+          isSuccess: true,
+          data: {
+            filePath: req.file.path,
+            fileName: req.file.filename,
+          },
         });
       }
     });
+  },
+
+  async delete(req: any, res: any, next: any) {
+    Video.findByIdAndUpdate({ _id: req.params.id }, { isActive: false })
+      .then((video: any) => {
+        if (video) {
+          res
+            .status(200)
+            .send({ isSuccess: true, msg: "Deleted successfully!" });
+        } else {
+          res
+            .status(400)
+            .send({ isSuccess: false, msg: "This video is not existing!" });
+        }
+      })
+      .catch(next);
   },
 };

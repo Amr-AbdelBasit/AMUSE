@@ -12,15 +12,15 @@ app.use(express.json());
 require("./routes/user_routes")(app);
 require("./routes/gender_routes")(app);
 require("./routes/video_route")(app);
-require("./routes/classification_routes")(app);
 require("./routes/category_routes")(app);
-require("./routes/type_routes")(app);
+require("./routes/genre_routes")(app);
 require("./routes/user_views_routes")(app);
 require("./routes/user_wish_list_routes")(app);
 require("./routes/subtitle_routes")(app);
 require("./routes/audio_routes")(app);
 require("./routes/cast_routes")(app);
-require("./routes/series_routes")(app);
+require("./routes/series_number.routes")(app);
+require("./routes/package_routes")(app);
 
 // var ffmpegbinaries = require("ffmpeg-binaries");
 // var ffmpeg = require("fluent-ffmpeg");
@@ -55,7 +55,7 @@ app.get("/file", function (req: any, res: any) {
 });
 
 app.use((err: any, req: any, res: any, next: any) => {
-  res.status(422).send({ error_message: err.message });
+  res.status(422).send({ isSuccess: false, err_msg: err.message });
 });
 
 const server = app.listen(port, () => {

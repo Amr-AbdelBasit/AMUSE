@@ -2,23 +2,20 @@ export {};
 const mongoose = require("mongoose");
 const referrenceValidator = require("mongoose-referrence-validator");
 require("./category");
-require("./classification");
 require("./subtitle");
 require("./audio");
 require("./cast");
-require("./series");
+require("./series_number");
+require("./videoHeader");
+require("./season");
 
 const videoSchema = new mongoose.Schema(
   {
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
     path: {
       type: String,
       required: true,
     },
-    name: {
+    title: {
       type: String,
       required: true,
     },
@@ -34,25 +31,34 @@ const videoSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    quality: {
+      type: String,
+      required: true,
+    },
     yearOfProduction: {
       type: Number,
       required: true,
     },
-    seriesNo: {
-      type: Number,
+    publishTime: {
+      type: String,
+      required: true,
     },
-    categoryId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "category",
-    },
-    classificationId: {
+    videoHeaderId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: "classification",
+      ref: "videoHeader",
     },
-    seriesId: {
+    isSeries: {
+      type: Boolean,
+      default: false,
+    },
+    seriesNoId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "series",
+      ref: "seriesNumber",
+    },
+    seasonId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "season",
     },
     subtitleId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -64,10 +70,9 @@ const videoSchema = new mongoose.Schema(
       required: true,
       ref: "audio",
     },
-    castIds: {
-      type: [mongoose.Schema.Types.ObjectId],
-      require: true,
-      ref: "cast",
+    isActive: {
+      type: Boolean,
+      default: true,
     },
   },
   {
@@ -77,6 +82,6 @@ const videoSchema = new mongoose.Schema(
 
 videoSchema.plugin(referrenceValidator);
 
-const videoModel = mongoose.model("video", videoSchema);
+const VideoModel = mongoose.model("video", videoSchema);
 
-module.exports = videoModel;
+module.exports = VideoModel;

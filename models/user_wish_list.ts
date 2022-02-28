@@ -4,19 +4,19 @@ const referrenceValidator = require("mongoose-referrence-validator");
 
 const userWishListSchema = new mongoose.Schema(
   {
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
-    user: {
+    userId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "user",
     },
-    video: {
+    videoId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "video",
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
     },
   },
   {
@@ -26,6 +26,6 @@ const userWishListSchema = new mongoose.Schema(
 
 userWishListSchema.plugin(referrenceValidator);
 
-const userWishListModel = mongoose.model("userWishList", userWishListSchema);
+const UserWishListModel = mongoose.model("userWishList", userWishListSchema);
 
-module.exports = userWishListModel;
+module.exports = UserWishListModel;

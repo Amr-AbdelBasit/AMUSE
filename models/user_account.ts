@@ -3,13 +3,10 @@ const mongoose = require("mongoose");
 const mongooseIntl = require("mongoose-intl");
 
 require("./user");
+require("./avatar");
 
 const userAccountSchema = new mongoose.Schema(
   {
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
     name: {
       type: String,
       required: true,
@@ -20,6 +17,11 @@ const userAccountSchema = new mongoose.Schema(
       required: true,
       ref: "user",
     },
+    avatarId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "avatar",
+    },
     isParent: {
       type: Boolean,
       required: true,
@@ -27,6 +29,10 @@ const userAccountSchema = new mongoose.Schema(
     },
     imgPath: {
       type: String,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
     },
   },
   {
@@ -39,6 +45,6 @@ userAccountSchema.plugin(mongooseIntl, {
   defaultLanguage: "en",
 });
 
-const userAccountModel = mongoose.model("userAccount", userAccountSchema);
+const UserAccountModel = mongoose.model("userAccount", userAccountSchema);
 
-module.exports = userAccountModel;
+module.exports = UserAccountModel;

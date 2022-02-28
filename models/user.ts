@@ -18,6 +18,9 @@ const userSchema = new mongoose.Schema(
       required: true,
       intl: true,
     },
+    imgPath: {
+      type: String,
+    },
     email: {
       type: String,
       required: true,
@@ -58,10 +61,6 @@ const userSchema = new mongoose.Schema(
         },
       },
     ],
-    userAccounts: {
-      type: [mongoose.Schema.Types.ObjectId],
-      ref: "userAccount",
-    },
     isActive: {
       type: Boolean,
       default: true,
@@ -94,6 +93,7 @@ userSchema.methods.toJSON = function () {
   const jsonObject = user.toObject();
   delete jsonObject.password;
   delete jsonObject.tokens;
+  delete jsonObject.isActive;
   return jsonObject;
 };
 userSchema.methods.setUserToken = async function () {
@@ -113,13 +113,15 @@ userSchema.statics.checkUsercredential = async function (
   // console.log("user", user);
 
   if (!user) {
-    return { Error: "Invalid Login Attempt!" };
+    return { Error: "There is no user with this phone!" };
   }
+
   const checkPwd = await bcrypt.compare(password, user.password);
 
   if (!checkPwd) {
-    return { Error: "Wrong Password !" };
+    return { Error: "Wrong password!" };
   }
+
   const token = await user.setUserToken();
 
   const userResponse: UserResponse = {
