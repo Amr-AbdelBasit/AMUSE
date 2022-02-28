@@ -4,14 +4,14 @@ const mongooseIntl = require("mongoose-intl");
 
 const genderSchema = new _mongoose.Schema(
   {
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
     name: {
       type: String,
       required: true,
       intl: true,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
     },
   },
   {

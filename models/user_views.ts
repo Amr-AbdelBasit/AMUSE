@@ -8,12 +8,12 @@ const userViewsSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    user: {
+    userId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "user",
     },
-    video: {
+    videoId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "video",
@@ -31,6 +31,6 @@ const userViewsSchema = new mongoose.Schema(
 
 userViewsSchema.plugin(referrenceValidator);
 
-const userViewsModel = mongoose.model("userViews", userViewsSchema);
+const UserViewsModel = mongoose.model("userViews", userViewsSchema);
 
-module.exports = userViewsModel;
+module.exports = UserViewsModel;

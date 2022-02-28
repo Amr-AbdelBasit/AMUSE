@@ -1,30 +1,30 @@
 export {};
 const mongoose = require("mongoose");
 const referrenceValidator = require("mongoose-referrence-validator");
-require("./type");
+require("./genre");
 const mongooseIntl = require("mongoose-intl");
 
 const categorySchema = new mongoose.Schema(
   {
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
     name: {
       type: String,
       required: true,
       intl: true,
     },
-    typeId: {
+    genreId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: "type",
+      ref: "genre",
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
     },
   },
   {
     timestamps: true,
   }
-).index({ typeId: 1, name: 1 }, { unique: true });
+).index({ genreId: 1, name: 1 }, { unique: true });
 
 categorySchema.plugin(mongooseIntl, {
   languages: ["ar", "en"],
@@ -33,6 +33,6 @@ categorySchema.plugin(mongooseIntl, {
 
 categorySchema.plugin(referrenceValidator);
 
-const categoryModel = mongoose.model("category", categorySchema);
+const CategoryModel = mongoose.model("category", categorySchema);
 
-module.exports = categoryModel;
+module.exports = CategoryModel;

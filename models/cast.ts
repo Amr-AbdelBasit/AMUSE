@@ -4,10 +4,6 @@ const mongooseIntl = require("mongoose-intl");
 
 const castSchema = new mongoose.Schema(
   {
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
     name: {
       type: String,
       required: true,
@@ -17,6 +13,10 @@ const castSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
     },
   },
   {
@@ -29,6 +29,6 @@ castSchema.plugin(mongooseIntl, {
   defaultLanguage: "en",
 });
 
-const castModel = mongoose.model("cast", castSchema);
+const CastModel = mongoose.model("cast", castSchema);
 
-module.exports = castModel;
+module.exports = CastModel;

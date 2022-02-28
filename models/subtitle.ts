@@ -4,14 +4,19 @@ const mongooseIntl = require("mongoose-intl");
 
 const subtitleSchema = new mongoose.Schema(
   {
-    isActive: {
-      type: Boolean,
-      default: true,
+    language: {
+      type: String,
+      required: true,
+      intl: true,
     },
     path: {
       type: String,
       required: true,
       intl: true,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
     },
   },
   {
@@ -24,6 +29,6 @@ subtitleSchema.plugin(mongooseIntl, {
   defaultLanguage: "en",
 });
 
-const subtitleModel = mongoose.model("subtitle", subtitleSchema);
+const SubtitleModel = mongoose.model("subtitle", subtitleSchema);
 
-module.exports = subtitleModel;
+module.exports = SubtitleModel;

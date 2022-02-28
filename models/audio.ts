@@ -4,14 +4,19 @@ const mongooseIntl = require("mongoose-intl");
 
 const audioSchema = new mongoose.Schema(
   {
-    isActive: {
-      type: Boolean,
-      default: true,
+    language: {
+      type: String,
+      required: true,
+      intl: true,
     },
     path: {
       type: String,
       required: true,
       intl: true,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
     },
   },
   {
@@ -24,6 +29,6 @@ audioSchema.plugin(mongooseIntl, {
   defaultLanguage: "en",
 });
 
-const audioModel = mongoose.model("audio", audioSchema);
+const AudioModel = mongoose.model("audio", audioSchema);
 
-module.exports = audioModel;
+module.exports = AudioModel;
